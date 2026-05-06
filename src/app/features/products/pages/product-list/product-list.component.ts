@@ -36,6 +36,9 @@ import { CsvExportService } from '../../../../shared/services/csv-export.service
 import { CategoryDto } from '../../../categories/models/category.model';
 import { GetAllCategoriesQuery } from '../../../categories/queries/get-all-categories/get-all-categories.query';
 import { GetAllCategoriesHandler } from '../../../categories/queries/get-all-categories/get-all-categories.handler';
+import { BrandDto } from '../../../brands/models/brand.model';
+import { GetBrandsQuery } from '../../../brands/queries/get-brands/get-brands.query';
+import { GetBrandsHandler } from '../../../brands/queries/get-brands/get-brands.handler';
 import { ProductDto } from '../../models/product.model';
 import { GetProductsQuery } from '../../queries/get-products/get-products.query';
 import { GetProductsHandler } from '../../queries/get-products/get-products.handler';
@@ -89,6 +92,7 @@ export class ProductListComponent implements OnInit {
 
   pagedData = signal<PagedResponse<ProductDto>>(defaultPagedResponse<ProductDto>());
   categories = signal<CategoryDto[]>([]);
+  brands     = signal<BrandDto[]>([]);
   loading = signal(false);
   initialLoad = signal(true);
 
@@ -98,6 +102,7 @@ export class ProductListComponent implements OnInit {
   searchValue = '';
   activeSearch = signal('');
   selectedCategoryIds = signal<string[]>([]);
+  selectedBrandIds    = signal<string[]>([]);
   selectedStatuses = signal<StatusDataPolicy[]>([]);
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
@@ -116,6 +121,11 @@ export class ProductListComponent implements OnInit {
   readonly categoryFilters = computed(() => {
     this.filterVersion();
     return this.categories().map(c => ({ text: c.name, value: c.id }));
+  });
+
+  readonly brandFilters = computed(() => {
+    this.filterVersion();
+    return this.brands().map(b => ({ text: b.name, value: b.id }));
   });
 
   readonly statusFilters = computed(() => {
@@ -139,6 +149,7 @@ export class ProductListComponent implements OnInit {
   get hasActiveFilters(): boolean {
     return !!this.activeSearch()
         || this.selectedCategoryIds().length > 0
+        || this.selectedBrandIds().length > 0
         || this.selectedStatuses().length > 0
         || this.minPrice() != null || this.maxPrice() != null;
   }
@@ -158,6 +169,7 @@ export class ProductListComponent implements OnInit {
     });
 
     this.loadCategories();
+    this.loadBrands();
     this.loadProducts();
   }
 
@@ -198,6 +210,7 @@ export class ProductListComponent implements OnInit {
     this.searchValue = '';
     this.activeSearch.set('');
     this.selectedCategoryIds.set([]);
+    this.selectedBrandIds.set([]);
     this.selectedStatuses.set([]);
     this.minPrice.set(null);
     this.maxPrice.set(null);
@@ -220,6 +233,17 @@ export class ProductListComponent implements OnInit {
       });
   }
 
+  loadBrands(): void {
+    this.mediator
+      .send(new GetBrandsQuery(1, 100), GetBrandsHandler)
+      .subscribe((result) => {
+        result.match(
+          (data) => this.brands.set(data.items),
+          () => {},
+        );
+      });
+  }
+
   loadProducts(): void {
     this._syncToUrl();
     this.loading.set(true);
@@ -230,6 +254,7 @@ export class ProductListComponent implements OnInit {
           pageSize: this.pageSize,
           search: this.activeSearch() || undefined,
           categoryIds: this.selectedCategoryIds().length > 0 ? this.selectedCategoryIds() : undefined,
+          brandIds: this.selectedBrandIds().length > 0 ? this.selectedBrandIds() : undefined,
           statuses: this.selectedStatuses().length > 0 ? this.selectedStatuses() : undefined,
           minPrice: this.minPrice() ?? undefined,
           maxPrice: this.maxPrice() ?? undefined,
@@ -258,6 +283,8 @@ export class ProductListComponent implements OnInit {
     this.sortOrder.set((activeSort?.value as 'ascend' | 'descend' | null) ?? null);
     const categoryFilter = params.filter.find(f => f.key === 'categoryId');
     this.selectedCategoryIds.set(categoryFilter?.value ?? []);
+    const brandFilter = params.filter.find(f => f.key === 'brandId');
+    this.selectedBrandIds.set(brandFilter?.value ?? []);
     const statusFilter = params.filter.find(f => f.key === 'status');
     this.selectedStatuses.set((statusFilter?.value ?? []) as StatusDataPolicy[]);
     this.loadProducts();
@@ -278,6 +305,14 @@ export class ProductListComponent implements OnInit {
       const categoryId = qp.get('categoryId');
       if (categoryId) this.selectedCategoryIds.set([categoryId]);
     }
+    // Support both ?brands=id1,id2 (our format) and legacy ?brandId=id (from brand detail link)
+    const brands = qp.get('brands');
+    if (brands) {
+      this.selectedBrandIds.set(brands.split(','));
+    } else {
+      const brandId = qp.get('brandId');
+      if (brandId) this.selectedBrandIds.set([brandId]);
+    }
     const statuses = qp.get('statuses');
     if (statuses) this.selectedStatuses.set(statuses.split(',') as StatusDataPolicy[]);
     const minP = qp.get('minPrice'); if (minP != null) { this.minPrice.set(Number(minP)); this.minPriceInput.set(Number(minP)); }
@@ -296,6 +331,7 @@ export class ProductListComponent implements OnInit {
         pageSize:   this.pageSize !== DEFAULT_PAGE_SIZE         ? this.pageSize                            : null,
         search:     this.activeSearch()                         ? this.activeSearch()                      : null,
         categories: this.selectedCategoryIds().length > 0       ? this.selectedCategoryIds().join(',')     : null,
+        brands:     this.selectedBrandIds().length > 0          ? this.selectedBrandIds().join(',')        : null,
         statuses:   this.selectedStatuses().length > 0          ? this.selectedStatuses().join(',')        : null,
         minPrice:   this.minPrice() != null                     ? this.minPrice()                          : null,
         maxPrice:   this.maxPrice() != null                     ? this.maxPrice()                          : null,
@@ -315,8 +351,8 @@ export class ProductListComponent implements OnInit {
   exportCsv(): void {
     this.csvExport.download(
       `products-page${this.currentPage}.csv`,
-      ['Name', 'Price', 'Category', 'Status'],
-      this.pagedData().items.map(p => [p.name, p.price?.toFixed(2) ?? '0.00', this.getCategoryName(p.categoryId), p.status]),
+      ['Name', 'Price', 'Category', 'Brand', 'Status'],
+      this.pagedData().items.map(p => [p.name, p.price?.toFixed(2) ?? '0.00', this.getCategoryName(p.categoryId), p.brandName ?? '—', p.status]),
     );
   }
 
@@ -336,5 +372,9 @@ export class ProductListComponent implements OnInit {
 
   getCategoryName(categoryId: string): string {
     return this.categories().find((c) => c.id === categoryId)?.name ?? '—';
+  }
+
+  getBrandName(brandId: string): string {
+    return this.brands().find((b) => b.id === brandId)?.name ?? '—';
   }
 }

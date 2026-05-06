@@ -1,0 +1,55 @@
+<app-page-header
+  [title]="brand()?.name ?? 'Brand Detail'"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  <app-detail-actions
+    backLink="/brands"
+    [showEdit]="canEdit && !!brand()"
+    [showDelete]="canDelete && !!brand()"
+    deleteTitle="Delete this brand?"
+    (edit)="openEditModal()"
+    (deleted)="delete()">
+  </app-detail-actions>
+</ng-template>
+
+<nz-card [nzBordered]="false">
+  <app-loading-container [loading]="loading()" [initialLoad]="true">
+    @if (brand(); as b) {
+    <nz-descriptions nzTitle="Brand Information" nzBordered [nzColumn]="2">
+
+      <nz-descriptions-item nzTitle="Name">
+        <strong>{{ b.name }}</strong>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="ID">
+        <code>{{ b.id }}</code>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Slug">
+        <code>{{ b.slug }}</code>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Status">
+        <app-status-tag [status]="b.status"></app-status-tag>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Products">
+        <a [routerLink]="['/products']"
+           [queryParams]="{ brandId: b.id }"
+           style="display: inline-flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600;">
+          {{ productCount() }} products from this brand
+          <span nz-icon nzType="arrow-right"></span>
+        </a>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Description" [nzSpan]="2">
+        {{ b.description || '—' }}
+      </nz-descriptions-item>
+
+    </nz-descriptions>
+    }
+  </app-loading-container>
+</nz-card>

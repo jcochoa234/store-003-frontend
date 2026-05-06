@@ -30,6 +30,11 @@
            class="nav-link">
           Categories
         </a>
+        <a routerLink="/brands"
+           routerLinkActive="nav-active"
+           class="nav-link">
+          Brands
+        </a>
         <a routerLink="/products"
            routerLinkActive="nav-active"
            class="nav-link">
@@ -109,6 +114,13 @@
            (click)="mobileMenuOpen.set(false)">
           <span nz-icon nzType="tags"></span>
           Categories
+        </a>
+        <a routerLink="/brands"
+           routerLinkActive="mobile-nav-active"
+           class="mobile-nav-link"
+           (click)="mobileMenuOpen.set(false)">
+          <span nz-icon nzType="shop"></span>
+          Brands
         </a>
         <a routerLink="/products"
            routerLinkActive="mobile-nav-active"

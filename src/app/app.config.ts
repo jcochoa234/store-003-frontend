@@ -42,6 +42,7 @@ import {
   BulbOutline,
   BulbFill,
   TeamOutline,
+  ShopOutline,
 } from '@ant-design/icons-angular/icons';
 import { routes } from './app.routes';
 import { GlobalErrorHandler } from './core/error/global-error.handler';
@@ -80,6 +81,7 @@ const NZ_ICONS = [
   DownloadOutline,
   BulbOutline,
   BulbFill,
+  ShopOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

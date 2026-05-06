@@ -25,6 +25,7 @@ export class GetProductsHandler
     };
     if (p.search)                                   params['search']     = p.search;
     if (p.categoryIds && p.categoryIds.length > 0)  params['categoryId'] = p.categoryIds.join(',');
+    if (p.brandIds && p.brandIds.length > 0)        params['brandId']    = p.brandIds.join(',');
     if (p.minPrice != null)             params['minPrice']   = p.minPrice;
     if (p.maxPrice != null)             params['maxPrice']   = p.maxPrice;
     if (p.statuses && p.statuses.length > 0) params['status'] = p.statuses.join(',');

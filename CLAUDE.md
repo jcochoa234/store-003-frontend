@@ -669,3 +669,10 @@ main.ts → bootstrapApplication(AppComponent, appConfig)
 Icons are tree-shaken and must be explicitly registered in `app.config.ts` under `provideNzIcons([...])`. Only import from `@ant-design/icons-angular/icons`.
 
 When adding a new icon, import its `Outline` variant and add it to the `NZ_ICONS` array in `app.config.ts`. Icon names follow the `[Name]Outline` / `[Name]Fill` / `[Name]TwoTone` naming convention.
+
+---
+
+## GitHub
+
+- **Repo API:** https://github.com/jcochoa234/store-003-api
+- **Repo Frontend:** https://github.com/jcochoa234/store-003-frontend
