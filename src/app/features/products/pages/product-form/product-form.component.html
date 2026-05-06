@@ -73,6 +73,22 @@
       </div>
     </div>
 
+    <!-- Brand (optional) -->
+    <nz-form-item>
+      <nz-form-label>Brand</nz-form-label>
+      <nz-form-control>
+        <nz-select
+          formControlName="brandId"
+          nzPlaceHolder="No brand (optional)"
+          nzShowSearch
+          nzAllowClear>
+          @for (brand of brands(); track brand.id) {
+            <nz-option [nzValue]="brand.id" [nzLabel]="brand.name"></nz-option>
+          }
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+
     <!-- Status -->
     <nz-form-item>
       <nz-form-label nzRequired>Status</nz-form-label>

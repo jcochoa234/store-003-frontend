@@ -47,6 +47,14 @@
           </nz-tag>
         }
       }
+      @if (selectedBrandIds().length > 0) {
+        @for (id of selectedBrandIds(); track id) {
+          <nz-tag nzColor="cyan" class="active-filter-tag">
+            <span nz-icon nzType="shop"></span>
+            {{ getBrandName(id) }}
+          </nz-tag>
+        }
+      }
       @if (selectedStatuses().length > 0) {
         @for (s of selectedStatuses(); track s) {
           <nz-tag [nzColor]="s | statusColor" class="active-filter-tag">
@@ -97,6 +105,11 @@
                 [nzFilterFn]="true"
                 [nzFilterMultiple]="true"
                 class="col-hide-mobile">Category</th>
+            <th nzColumnKey="brandId"
+                [nzFilters]="brandFilters()"
+                [nzFilterFn]="true"
+                [nzFilterMultiple]="true"
+                class="col-hide-mobile">Brand</th>
             <th nzWidth="120px"
                 nzColumnKey="status"
                 [nzFilters]="statusFilters()"
@@ -117,6 +130,7 @@
                 ${{ product.price | number: '1.2-2' }}
               </td>
               <td class="text-muted col-hide-mobile">{{ getCategoryName(product.categoryId) }}</td>
+              <td class="text-muted col-hide-mobile">{{ product.brandName || '—' }}</td>
               <td class="col-hide-mobile">
                 <app-status-tag [status]="product.status"></app-status-tag>
               </td>

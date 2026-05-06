@@ -20,6 +20,9 @@ import { CharCounterComponent } from '../../../../shared/components/char-counter
 import { CategoryDto } from '../../../categories/models/category.model';
 import { GetAllCategoriesQuery } from '../../../categories/queries/get-all-categories/get-all-categories.query';
 import { GetAllCategoriesHandler } from '../../../categories/queries/get-all-categories/get-all-categories.handler';
+import { BrandDto } from '../../../brands/models/brand.model';
+import { GetBrandsQuery } from '../../../brands/queries/get-brands/get-brands.query';
+import { GetBrandsHandler } from '../../../brands/queries/get-brands/get-brands.handler';
 import { CreateProductCommand } from '../../commands/create-product/create-product.command';
 import { CreateProductHandler } from '../../commands/create-product/create-product.handler';
 import { UpdateProductCommand } from '../../commands/update-product/update-product.command';
@@ -61,6 +64,7 @@ export class ProductFormComponent implements OnInit {
   isEditMode = signal(false);
   productId  = signal<string | null>(null);
   categories = signal<CategoryDto[]>([]);
+  brands     = signal<BrandDto[]>([]);
   nameLength = signal(0);
 
   readonly NAME_MAX = 150;
@@ -71,6 +75,7 @@ export class ProductFormComponent implements OnInit {
     this._buildForm();
     this._setupCharCounters();
     this._loadCategories();
+    this._loadBrands();
 
     const id = this.data?.id;
     if (id) {
@@ -85,6 +90,7 @@ export class ProductFormComponent implements OnInit {
       name:       ['',   [Validators.required, Validators.maxLength(this.NAME_MAX), CustomValidators.notWhiteSpace()]],
       price:      [null, [Validators.required, CustomValidators.positiveOrZero()]],
       categoryId: [null, [Validators.required]],
+      brandId:    [null],
       status:     [StatusDataPolicy.Active, [Validators.required]],
     });
   }
@@ -102,6 +108,14 @@ export class ProductFormComponent implements OnInit {
       ));
   }
 
+  private _loadBrands(): void {
+    this.mediator.send(new GetBrandsQuery(1, 100), GetBrandsHandler)
+      .subscribe(result => result.match(
+        (data) => this.brands.set(data.items),
+        ()     => {},
+      ));
+  }
+
   private _loadProduct(id: string): void {
     this.loading.set(true);
     this.mediator.send(new GetProductByIdQuery(id), GetProductByIdHandler)
@@ -112,6 +126,7 @@ export class ProductFormComponent implements OnInit {
               name:       product.name,
               price:      product.price,
               categoryId: product.categoryId,
+              brandId:    product.brandId ?? null,
               status:     product.status ?? StatusDataPolicy.Active,
             });
             this.form.markAsPristine();
@@ -129,10 +144,10 @@ export class ProductFormComponent implements OnInit {
     }
 
     this.submitting.set(true);
-    const { name, price, categoryId, status } = this.form.value;
+    const { name, price, categoryId, brandId, status } = this.form.value;
 
     if (this.isEditMode()) {
-      this.mediator.send(new UpdateProductCommand({ id: this.productId()!, name, price, categoryId, status }), UpdateProductHandler)
+      this.mediator.send(new UpdateProductCommand({ id: this.productId()!, name, price, categoryId, brandId: brandId ?? undefined, status }), UpdateProductHandler)
         .subscribe(result => {
           result.match(
             () => { this.form.markAsPristine(); this.notify.updated('Product'); this.modalRef.close(true); },
@@ -141,7 +156,7 @@ export class ProductFormComponent implements OnInit {
           this.submitting.set(false);
         });
     } else {
-      this.mediator.send(new CreateProductCommand({ name, price, categoryId, status }), CreateProductHandler)
+      this.mediator.send(new CreateProductCommand({ name, price, categoryId, brandId: brandId ?? undefined, status }), CreateProductHandler)
         .subscribe(result => {
           result.match(
             () => { this.form.markAsPristine(); this.notify.created('Product'); this.modalRef.close(true); },

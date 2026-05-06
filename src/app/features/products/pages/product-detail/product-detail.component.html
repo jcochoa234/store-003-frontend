@@ -42,6 +42,14 @@
         <app-status-tag [status]="p.status"></app-status-tag>
       </nz-descriptions-item>
 
+      <nz-descriptions-item nzTitle="Brand">
+        @if (p.brandId) {
+          <a [routerLink]="['/brands', p.brandId]">{{ p.brandName || p.brandId }}</a>
+        } @else {
+          <span class="text-muted">—</span>
+        }
+      </nz-descriptions-item>
+
     </nz-descriptions>
     }
   </app-loading-container>

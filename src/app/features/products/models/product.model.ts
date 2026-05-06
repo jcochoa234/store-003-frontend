@@ -3,13 +3,15 @@ import { StatusDataPolicy } from '../../../core/models/status-data-policy.enum';
 
 /**
  * Mirrors ProductDto from the .NET Application layer exactly.
- * record ProductDto(Guid Id, string Name, decimal Price, Guid CategoryId, StatusDataPolicy Status)
+ * record ProductDto(Guid Id, string Name, decimal Price, Guid CategoryId, Guid? BrandId, string? BrandName, StatusDataPolicy Status)
  */
 export interface ProductDto {
   id: string;
   name: string;
   price: number;
   categoryId: string;
+  brandId?: string;
+  brandName?: string;
   status?: StatusDataPolicy;
 }
 
@@ -18,6 +20,7 @@ export interface CreateProductRequest {
   name: string;
   price: number;
   categoryId: string;
+  brandId?: string;
   status: StatusDataPolicy;
 }
 
@@ -30,6 +33,7 @@ export interface UpdateProductRequest {
   name: string;
   price: number;
   categoryId: string;
+  brandId?: string;
   status: StatusDataPolicy;
 }
 
@@ -37,6 +41,7 @@ export interface UpdateProductRequest {
 export interface GetProductsRequest extends PagedQuery {
   search?: string;
   categoryIds?: string[];
+  brandIds?: string[];
   minPrice?: number;
   maxPrice?: number;
   statuses?: StatusDataPolicy[];
