@@ -44,11 +44,6 @@ export const routes: Routes = [
             (m) => m.PRODUCTS_ROUTES
           ),
       },
-      {
-        path: 'suppliers',
-        loadChildren: () =>
-          import('./features/suppliers/suppliers.routes').then(m => m.SUPPLIERS_ROUTES),
-      },
     ],
   },
 

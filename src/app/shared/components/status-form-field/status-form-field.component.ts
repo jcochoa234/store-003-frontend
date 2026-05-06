@@ -2,7 +2,7 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { STATUS_OPTIONS } from '../../../../core/models/status-data-policy.enum';
+import { STATUS_OPTIONS } from '@core/models/status-data-policy.enum';
 
 /**
  * Standardized Status form field for modal forms.
