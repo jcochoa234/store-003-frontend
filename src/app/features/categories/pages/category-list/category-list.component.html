@@ -1,0 +1,134 @@
+<app-page-header
+  title="Categories"
+  subtitle="Manage product categories"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  @if (canCreate) {
+    <button nz-button nzType="primary" (click)="openFormModal()">
+      <span nz-icon nzType="plus"></span>
+      New Category
+    </button>
+  }
+</ng-template>
+
+<nz-card [nzBordered]="false">
+
+  <!-- Filter bar -->
+  <app-list-toolbar
+    placeholder="Search categories..."
+    [searchValue]="searchValue"
+    (searchValueChange)="onSearch($event)"
+    (searchCleared)="clearSearch()"
+    [totalCount]="pagedData().totalCount"
+    [hasActiveFilters]="hasActiveFilters"
+    [canExport]="enableExport && pagedData().items.length > 0"
+    (clearAll)="clearAllFilters()"
+    (exportData)="exportCsv()">
+  </app-list-toolbar>
+
+  <!-- Active filter tags -->
+  @if (hasActiveFilters) {
+    <div class="active-filters">
+      @if (activeSearch()) {
+        <nz-tag nzColor="blue" class="active-filter-tag">
+          <span nz-icon nzType="search"></span>
+          "{{ activeSearch() }}"
+          <span nz-icon nzType="close" class="tag-close" (click)="clearSearch()"></span>
+        </nz-tag>
+      }
+      @if (selectedStatuses().length > 0) {
+        @for (s of selectedStatuses(); track s) {
+          <nz-tag [nzColor]="s | statusColor" class="active-filter-tag">
+            {{ s | statusLabel }}
+          </nz-tag>
+        }
+      }
+    </div>
+  }
+
+  <!-- Table -->
+  <app-loading-container [initialLoad]="initialLoad()" [loading]="loading()">
+      <nz-table
+        [nzData]="pagedData().items"
+        [nzTotal]="pagedData().totalCount"
+        [nzPageIndex]="currentPage"
+        [nzPageSize]="pageSize"
+        [nzFrontPagination]="false"
+        [nzShowTotal]="totalTemplate"
+        [nzNoResult]="emptyTemplate"
+        nzShowSizeChanger
+        (nzQueryParams)="onQueryParamsChange($event)">
+
+        <thead>
+          <tr>
+            <th nzColumnKey="name" [nzSortFn]="true">Name</th>
+            <th nzColumnKey="description" [nzSortFn]="true" class="col-hide-mobile">Description</th>
+            <th nzWidth="120px"
+                nzColumnKey="status"
+                [nzFilters]="statusFilters()"
+                [nzFilterFn]="true"
+                [nzFilterMultiple]="true"
+                class="col-hide-mobile">Status</th>
+            <th nzWidth="120px" nzAlign="center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (category of pagedData().items; track category.id) {
+            <tr>
+              <td><a [routerLink]="[category.id]"><strong>{{ category.name }}</strong></a></td>
+              <td class="text-muted col-hide-mobile">{{ category.description || '—' }}</td>
+              <td class="col-hide-mobile">
+                <app-status-tag [status]="category.status"></app-status-tag>
+              </td>
+              <td nzAlign="center">
+                <nz-space>
+                  <button *nzSpaceItem nz-button nzType="default" nzSize="small"
+                          nz-tooltip nzTooltipTitle="View detail"
+                          aria-label="View category detail" [routerLink]="[category.id]">
+                    <span nz-icon nzType="eye"></span>
+                  </button>
+                  @if (canCreate) {
+                    <button *nzSpaceItem nz-button nzType="default" nzSize="small"
+                            nz-tooltip nzTooltipTitle="Edit"
+                            aria-label="Edit category"
+                            (click)="openFormModal(category.id)">
+                      <span nz-icon nzType="edit"></span>
+                    </button>
+                  }
+                  @if (canDelete) {
+                    <button *nzSpaceItem nz-button nzDanger nzSize="small"
+                            nz-tooltip nzTooltipTitle="Delete"
+                            aria-label="Delete category"
+                            nz-popconfirm [nzPopconfirmTitle]="'Delete &quot;' + category.name + '&quot;?'"
+                            nzPopconfirmPlacement="left"
+                            (nzOnConfirm)="deleteCategory(category.id)">
+                      <span nz-icon nzType="delete"></span>
+                    </button>
+                  }
+                </nz-space>
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </nz-table>
+  </app-loading-container>
+</nz-card>
+
+<ng-template #emptyTemplate>
+  <app-empty-state
+    entityName="Category"
+    [hasActiveFilters]="hasActiveFilters"
+    [canCreate]="canCreate"
+    (clearFilters)="clearAllFilters()"
+    (create)="openFormModal()">
+  </app-empty-state>
+</ng-template>
+
+<ng-template #totalTemplate let-total>
+  Total: <strong>{{ total }}</strong> categories
+</ng-template>

@@ -1,0 +1,85 @@
+<app-page-header
+  title="Suppliers"
+  subtitle="Manage your suppliers"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  @if (canCreate) {
+    <button nz-button nzType="primary" (click)="openFormModal()">
+      <span nz-icon nzType="plus"></span> New Supplier
+    </button>
+  }
+</ng-template>
+
+<nz-card [nzBordered]="false">
+  <app-list-toolbar
+    placeholder="Search suppliers..."
+    [searchValue]="searchValue"
+    [totalCount]="pagedData().totalCount"
+    [hasActiveFilters]="hasActiveFilters"
+    [canExport]="enableExport"
+    (searchValueChange)="onSearch($event)"
+    (searchCleared)="clearSearch()"
+    (clearAll)="clearAllFilters()"
+    (exportData)="exportCsv()">
+  </app-list-toolbar>
+
+  <app-loading-container [initialLoad]="initialLoad()" [loading]="loading()">
+    <nz-table
+      [nzData]="pagedData().items"
+      [nzFrontPagination]="false"
+      [nzTotal]="pagedData().totalCount"
+      [nzPageIndex]="currentPage"
+      [nzPageSize]="pageSize"
+      [nzNoResult]="emptyTemplate"
+      nzSize="middle"
+      (nzQueryParams)="onQueryParamsChange($event)">
+      <thead>
+        <tr>
+          <th nzColumnKey="name" [nzSortFn]="true">Name</th>
+          <th>Contact Email</th>
+          <th>Phone</th>
+          <th
+            nzColumnKey="status"
+            [nzFilters]="statusFilters()"
+            [nzFilterFn]="true"
+            [nzFilterMultiple]="true">Status</th>
+          <th nzAlign="center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (supplier of pagedData().items; track supplier.id) {
+          <tr>
+            <td>{{ supplier.name }}</td>
+            <td>{{ supplier.contactEmail }}</td>
+            <td>{{ supplier.phone }}</td>
+            <td><app-status-tag [status]="supplier.status"></app-status-tag></td>
+            <td nzAlign="center">
+              <app-table-row-actions
+                [viewLink]="[supplier.id]"
+                [showEdit]="canCreate"
+                [showDelete]="canDelete"
+                [deleteTitle]="'Delete &quot;' + supplier.name + '&quot;?'"
+                entityLabel="supplier"
+                (edit)="openFormModal(supplier.id)"
+                (deleted)="deleteSupplier(supplier.id)">
+              </app-table-row-actions>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </app-loading-container>
+</nz-card>
+
+<ng-template #emptyTemplate>
+  <app-empty-state
+    entityName="Supplier"
+    [hasActiveFilters]="hasActiveFilters"
+    [canCreate]="canCreate"
+    (clearFilters)="clearAllFilters()"
+    (create)="openFormModal()">
+  </app-empty-state>
+</ng-template>

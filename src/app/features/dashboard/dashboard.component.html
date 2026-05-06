@@ -1,0 +1,121 @@
+<div class="dashboard-wrapper">
+
+  <!-- Welcome bar -->
+  <div class="welcome-bar">
+    <div>
+      <h2 class="welcome-title">Welcome back, {{ keycloak.fullName() || keycloak.username() }}</h2>
+      <p class="welcome-sub">Here's an overview of your system.</p>
+    </div>
+  </div>
+
+  <div nz-row [nzGutter]="[24, 24]">
+
+    <!-- ── Left: User profile card ─────────────────────────────────────── -->
+    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="8" [nzLg]="6">
+      <nz-card [nzBordered]="false" class="profile-card">
+
+        <div class="profile-header">
+          <nz-avatar [nzSize]="80" [nzText]="getInitials()" class="profile-avatar"></nz-avatar>
+          <h3 class="profile-name">{{ keycloak.fullName() || keycloak.username() }}</h3>
+          <p class="profile-email">{{ keycloak.profile()?.email }}</p>
+          <div class="profile-roles">
+            @for (role of keycloak.roles(); track role) {
+              <nz-tag [nzColor]="'cyan'">{{ role }}</nz-tag>
+            }
+          </div>
+        </div>
+
+        <nz-divider></nz-divider>
+
+        <div class="profile-stats">
+          <div class="ps-item">
+            <span class="ps-value">{{ totalCategories() }}</span>
+            <span class="ps-label">Categories</span>
+          </div>
+          <div class="ps-sep"></div>
+          <div class="ps-item">
+            <span class="ps-value">{{ totalProducts() }}</span>
+            <span class="ps-label">Products</span>
+          </div>
+        </div>
+
+      </nz-card>
+    </div>
+
+    <!-- ── Right: Stats + Actions ─────────────────────────────────────── -->
+    <div nz-col [nzXs]="24" [nzSm]="24" [nzMd]="16" [nzLg]="18">
+      <div nz-row [nzGutter]="[24, 24]">
+
+        <!-- Categories stat -->
+        <div nz-col [nzXs]="24" [nzSm]="12">
+          <nz-card [nzBordered]="false" class="stat-card">
+            <div class="stat-inner">
+              <div class="stat-icon-box stat-blue">
+                <span nz-icon nzType="tags"></span>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Total Categories</p>
+                <h3 class="stat-value">{{ totalCategories() }}</h3>
+              </div>
+            </div>
+            <nz-divider></nz-divider>
+            <a routerLink="/categories" class="stat-action">
+              <span nz-icon nzType="arrow-right"></span> View all categories
+            </a>
+          </nz-card>
+        </div>
+
+        <!-- Products stat -->
+        <div nz-col [nzXs]="24" [nzSm]="12">
+          <nz-card [nzBordered]="false" class="stat-card">
+            <div class="stat-inner">
+              <div class="stat-icon-box stat-teal">
+                <span nz-icon nzType="inbox"></span>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Total Products</p>
+                <h3 class="stat-value">{{ totalProducts() }}</h3>
+              </div>
+            </div>
+            <nz-divider></nz-divider>
+            <a routerLink="/products" class="stat-action">
+              <span nz-icon nzType="arrow-right"></span> View all products
+            </a>
+          </nz-card>
+        </div>
+
+        <!-- Quick Actions -->
+        <div nz-col [nzXs]="24">
+          <nz-card [nzBordered]="false" class="actions-card">
+            <div class="actions-header">
+              <span nz-icon nzType="dashboard" class="actions-icon"></span>
+              <span class="actions-title">Quick Actions</span>
+            </div>
+            <div class="actions-grid">
+              @if (keycloak.canAccess('supervisor')) {
+                <button nz-button nzType="primary" (click)="openNewCategory()" class="action-btn action-primary">
+                  <span nz-icon nzType="plus"></span>
+                  New Category
+                </button>
+                <button nz-button nzType="primary" (click)="openNewProduct()" class="action-btn action-primary">
+                  <span nz-icon nzType="plus"></span>
+                  New Product
+                </button>
+              }
+              <button nz-button routerLink="/categories" class="action-btn action-default">
+                <span nz-icon nzType="tags"></span>
+                Manage Categories
+              </button>
+              <button nz-button routerLink="/products" class="action-btn action-default">
+                <span nz-icon nzType="inbox"></span>
+                Manage Products
+              </button>
+            </div>
+          </nz-card>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

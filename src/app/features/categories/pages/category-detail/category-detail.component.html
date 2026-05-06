@@ -1,0 +1,51 @@
+<app-page-header
+  [title]="category()?.name ?? 'Category Detail'"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  <app-detail-actions
+    backLink="/categories"
+    [showEdit]="canEdit && !!category()"
+    [showDelete]="canDelete && !!category()"
+    deleteTitle="Delete this category?"
+    (edit)="openEditModal()"
+    (deleted)="delete()">
+  </app-detail-actions>
+</ng-template>
+
+<nz-card [nzBordered]="false">
+  <app-loading-container [loading]="loading()" [initialLoad]="true">
+    @if (category(); as c) {
+    <nz-descriptions nzTitle="Category Information" nzBordered [nzColumn]="2">
+
+      <nz-descriptions-item nzTitle="Name">
+        <strong>{{ c.name }}</strong>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="ID">
+        <code>{{ c.id }}</code>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Status">
+        <app-status-tag [status]="c.status"></app-status-tag>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Products">
+        <a [routerLink]="['/products']"
+           [queryParams]="{ categoryId: c.id }"
+           style="display: inline-flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 600;">
+          {{ productCount() }} products in this category
+          <span nz-icon nzType="arrow-right"></span>
+        </a>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Description" [nzSpan]="2">
+        {{ c.description || '—' }}
+      </nz-descriptions-item>
+
+    </nz-descriptions>
+    }
+  </app-loading-container>
+</nz-card>

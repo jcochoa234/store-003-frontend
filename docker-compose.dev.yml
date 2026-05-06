@@ -1,0 +1,34 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.dev.yml — Development hot-reload override
+#
+# Overrides the frontend service to use `ng serve` instead of nginx.
+# Mounts the local source code so that any saved file triggers an instant
+# recompile inside the container — no rebuild needed.
+#
+# Usage (standalone frontend with hot-reload):
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Usage (full stack with hot-reload):
+#   docker-compose -f docker-compose.full.yml -f docker-compose.dev.yml up
+#
+# The Angular dev server is available at: http://localhost:4200
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  frontend:
+    image: node:20-alpine
+    container_name: sstemplate_frontend_dev
+    command: sh -c "npm install && npx ng serve --host 0.0.0.0 --port 4200 --poll 500"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules    # anonymous volume — prevents host node_modules from overwriting container's
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+      # Enable polling for file-system events inside Docker on Windows/macOS
+      - CHOKIDAR_USEPOLLING=true
+    restart: unless-stopped

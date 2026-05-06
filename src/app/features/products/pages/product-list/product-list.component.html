@@ -1,0 +1,203 @@
+<app-page-header
+  title="Products"
+  subtitle="Manage the product catalog"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  @if (canCreate) {
+    <button nz-button nzType="primary" (click)="openFormModal()">
+      <span nz-icon nzType="plus"></span>
+      New Product
+    </button>
+  }
+</ng-template>
+
+<nz-card [nzBordered]="false">
+
+  <!-- Filter bar -->
+  <app-list-toolbar
+    placeholder="Search products..."
+    [searchValue]="searchValue"
+    (searchValueChange)="onSearch($event)"
+    (searchCleared)="clearSearch()"
+    [totalCount]="pagedData().totalCount"
+    [hasActiveFilters]="hasActiveFilters"
+    [canExport]="enableExport && pagedData().items.length > 0"
+    (clearAll)="clearAllFilters()"
+    (exportData)="exportCsv()">
+  </app-list-toolbar>
+
+  <!-- Active filter tags -->
+  @if (hasActiveFilters) {
+    <div class="active-filters">
+      @if (activeSearch()) {
+        <nz-tag nzColor="blue" class="active-filter-tag">
+          <span nz-icon nzType="search"></span>
+          "{{ activeSearch() }}"
+          <span nz-icon nzType="close" class="tag-close" (click)="clearSearch()"></span>
+        </nz-tag>
+      }
+      @if (selectedCategoryIds().length > 0) {
+        @for (id of selectedCategoryIds(); track id) {
+          <nz-tag nzColor="geekblue" class="active-filter-tag">
+            <span nz-icon nzType="tags"></span>
+            {{ getCategoryName(id) }}
+          </nz-tag>
+        }
+      }
+      @if (selectedStatuses().length > 0) {
+        @for (s of selectedStatuses(); track s) {
+          <nz-tag [nzColor]="s | statusColor" class="active-filter-tag">
+            {{ s | statusLabel }}
+          </nz-tag>
+        }
+      }
+      @if (minPrice() != null || maxPrice() != null) {
+        <nz-tag nzColor="purple" class="active-filter-tag">
+          <span nz-icon nzType="dollar"></span>
+          @if (minPrice() != null) { ${{ minPrice() }} }
+          @if (minPrice() != null && maxPrice() != null) { — }
+          @if (maxPrice() != null) { ${{ maxPrice() }} }
+          <span nz-icon nzType="close" class="tag-close" (click)="clearPriceRange()"></span>
+        </nz-tag>
+      }
+    </div>
+  }
+
+  <!-- Table -->
+  <app-loading-container [initialLoad]="initialLoad()" [loading]="loading()">
+      <nz-table
+        [nzData]="pagedData().items"
+        [nzTotal]="pagedData().totalCount"
+        [nzPageIndex]="currentPage"
+        [nzPageSize]="pageSize"
+        [nzFrontPagination]="false"
+        [nzShowTotal]="totalTemplate"
+        [nzNoResult]="emptyTemplate"
+        nzShowSizeChanger
+        (nzQueryParams)="onQueryParamsChange($event)">
+
+        <thead>
+          <tr>
+            <th nzColumnKey="name" [nzSortFn]="true">Name</th>
+            <th nzColumnKey="price" [nzSortFn]="true" nzWidth="150px" nzAlign="right" [nzCustomFilter]="true">
+              <nz-filter-trigger
+                [nzVisible]="priceFilterVisible()"
+                (nzVisibleChange)="onPriceFilterVisibleChange($event)"
+                [nzActive]="minPrice() != null || maxPrice() != null"
+                [nzDropdownMenu]="priceFilterMenu">
+                <span nz-icon nzType="filter" nzTheme="fill"></span>
+              </nz-filter-trigger>
+              Price
+            </th>
+            <th nzColumnKey="categoryId"
+                [nzFilters]="categoryFilters()"
+                [nzFilterFn]="true"
+                [nzFilterMultiple]="true"
+                class="col-hide-mobile">Category</th>
+            <th nzWidth="120px"
+                nzColumnKey="status"
+                [nzFilters]="statusFilters()"
+                [nzFilterFn]="true"
+                [nzFilterMultiple]="true"
+                class="col-hide-mobile">Status</th>
+            <th nzWidth="120px" nzAlign="center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (product of pagedData().items; track product.id) {
+            <tr>
+              <td>
+                <a [routerLink]="[product.id]"><strong>{{ product.name }}</strong></a>
+              </td>
+              <td nzAlign="right" class="price">
+                ${{ product.price | number: '1.2-2' }}
+              </td>
+              <td class="text-muted col-hide-mobile">{{ getCategoryName(product.categoryId) }}</td>
+              <td class="col-hide-mobile">
+                <app-status-tag [status]="product.status"></app-status-tag>
+              </td>
+              <td nzAlign="center">
+                <nz-space>
+                  <button *nzSpaceItem nz-button nzType="default" nzSize="small"
+                          nz-tooltip nzTooltipTitle="View detail"
+                          aria-label="View product detail" [routerLink]="[product.id]">
+                    <span nz-icon nzType="eye"></span>
+                  </button>
+                  @if (canCreate) {
+                    <button *nzSpaceItem nz-button nzType="default" nzSize="small"
+                            nz-tooltip nzTooltipTitle="Edit"
+                            aria-label="Edit product"
+                            (click)="openFormModal(product.id)">
+                      <span nz-icon nzType="edit"></span>
+                    </button>
+                  }
+                  @if (canDelete) {
+                    <button *nzSpaceItem nz-button nzDanger nzSize="small"
+                            nz-tooltip nzTooltipTitle="Delete"
+                            aria-label="Delete product"
+                            nz-popconfirm [nzPopconfirmTitle]="'Delete &quot;' + product.name + '&quot;?'"
+                            nzPopconfirmPlacement="left"
+                            (nzOnConfirm)="deleteProduct(product.id)">
+                      <span nz-icon nzType="delete"></span>
+                    </button>
+                  }
+                </nz-space>
+              </td>
+            </tr>
+          }
+
+        </tbody>
+      </nz-table>
+  </app-loading-container>
+</nz-card>
+
+<nz-dropdown-menu #priceFilterMenu="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown price-filter-dropdown">
+    <div class="price-filter-inputs">
+      <nz-input-number
+        [ngModel]="minPriceInput()"
+        (ngModelChange)="minPriceInput.set($event)"
+        nzPlaceHolder="Min $"
+        [nzMin]="0" [nzStep]="1"
+        [nzFormatter]="priceFormatter"
+        [nzParser]="priceParser"
+        class="price-filter-input"
+        aria-label="Minimum price">
+      </nz-input-number>
+      <span class="price-separator">—</span>
+      <nz-input-number
+        [ngModel]="maxPriceInput()"
+        (ngModelChange)="maxPriceInput.set($event)"
+        nzPlaceHolder="Max $"
+        [nzMin]="0" [nzStep]="1"
+        [nzFormatter]="priceFormatter"
+        [nzParser]="priceParser"
+        class="price-filter-input"
+        aria-label="Maximum price">
+      </nz-input-number>
+    </div>
+    <nz-divider style="margin: 8px 0;"></nz-divider>
+    <div class="price-filter-actions">
+      <button nz-button nzSize="small" (click)="clearPriceRange()">Reset</button>
+      <button nz-button nzSize="small" nzType="primary" (click)="applyPriceFilter()">OK</button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<ng-template #emptyTemplate>
+  <app-empty-state
+    entityName="Product"
+    [hasActiveFilters]="hasActiveFilters"
+    [canCreate]="canCreate"
+    (clearFilters)="clearAllFilters()"
+    (create)="openFormModal()">
+  </app-empty-state>
+</ng-template>
+
+<ng-template #totalTemplate let-total>
+  Total: <strong>{{ total }}</strong> products
+</ng-template>

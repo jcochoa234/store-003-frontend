@@ -1,0 +1,362 @@
+// ── NG-Zorro theme variables (must be defined BEFORE the import) ─────────────
+@primary-color:      #1890ff;
+@link-color:         #1890ff;
+@success-color:      #52c41a;
+@warning-color:      #faad14;
+@error-color:        #ff4d4f;
+@font-size-base:     14px;
+@border-radius-base: 8px;
+@border-color-base:  #d9d9d9;
+@box-shadow-base:    0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+
+// ── Import NG-Zorro (picks up the variables above) ───────────────────────────
+@import 'ng-zorro-antd/ng-zorro-antd.less';
+
+// ── Global resets ─────────────────────────────────────────────────────────────
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+  background-color: #f0f2f5;
+}
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// ── NG-Zorro border-radius overrides (CSS-level, ensures 8px everywhere) ─────
+.ant-card,
+.ant-card-bordered {
+  border-radius: 8px !important;
+}
+
+.ant-btn {
+  border-radius: 8px !important;
+}
+
+.ant-btn-sm {
+  border-radius: 6px !important;
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector,
+.ant-input-number,
+.ant-picker {
+  border-radius: 8px !important;
+}
+
+.ant-select-dropdown,
+.ant-dropdown-menu,
+.ant-popover-inner,
+.ant-tooltip-inner,
+.ant-modal-content {
+  border-radius: 8px !important;
+}
+
+.ant-table {
+  border-radius: 8px !important;
+}
+
+.ant-pagination-item,
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+  border-radius: 6px !important;
+}
+
+.ant-tag {
+  border-radius: 6px !important;
+}
+
+// ── Dark mode ─────────────────────────────────────────────────────────────────
+// Applied when ThemeService sets data-theme="dark" on <html>.
+// Covers custom layout / component styles. NG-Zorro component internals
+// (cards, tables, inputs, etc.) are overridden via known CSS class selectors.
+html[data-theme="dark"] {
+
+  // ── Base ──────────────────────────────────────────────────────────────────
+  body {
+    background-color: #141414;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  // ── Layout ────────────────────────────────────────────────────────────────
+  .app-layout,
+  .ant-layout {
+    background: #141414 !important;
+  }
+
+  .app-header,
+  .ant-layout-header {
+    background: #1f1f1f !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .app-content,
+  .ant-layout-content {
+    background: #141414 !important;
+  }
+
+  .app-footer,
+  .ant-layout-footer {
+    background: #141414 !important;
+    border-top-color: #303030 !important;
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  // ── Header internals ──────────────────────────────────────────────────────
+
+  .user-meta .user-name {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .user-meta .user-role,
+  .notif-icon {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.45) !important;
+    &:hover  { color: rgba(255, 255, 255, 0.85) !important; border-bottom-color: rgba(23,195,190,0.4) !important; }
+    &.nav-active { color: #17C3BE !important; border-bottom-color: #17C3BE !important; }
+  }
+
+  .hamburger-btn,
+  .theme-toggle-btn {
+    color: rgba(255, 255, 255, 0.45) !important;
+    &:hover { color: rgba(255, 255, 255, 0.85) !important; background: rgba(255,255,255,0.06) !important; }
+  }
+
+  .user-trigger:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+  }
+
+  // ── Cards ─────────────────────────────────────────────────────────────────
+  .ant-card,
+  .ant-card-bordered {
+    background: #1f1f1f !important;
+    border-color: #303030 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-card-head {
+    background: #1f1f1f !important;
+    border-bottom-color: #303030 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  // ── Tables ────────────────────────────────────────────────────────────────
+  .ant-table {
+    background: #1f1f1f !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #262626 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    border-bottom-color: #303030 !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    background: #1f1f1f !important;
+    border-bottom-color: #303030 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-table-tbody > tr:hover > td,
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background: #2a2a2a !important;
+  }
+
+  .ant-table-wrapper .ant-spin-container {
+    background: transparent !important;
+  }
+
+  // ── Pagination ────────────────────────────────────────────────────────────
+  .ant-pagination-item {
+    background: #1f1f1f !important;
+    border-color: #303030 !important;
+    a { color: rgba(255, 255, 255, 0.65) !important; }
+  }
+
+  .ant-pagination-item-active {
+    background: #17C3BE !important;
+    border-color: #17C3BE !important;
+    a { color: #fff !important; }
+  }
+
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link {
+    background: #1f1f1f !important;
+    border-color: #303030 !important;
+    color: rgba(255, 255, 255, 0.65) !important;
+  }
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background: #2a2a2a !important;
+  }
+
+  // ── Inputs ────────────────────────────────────────────────────────────────
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    background: #262626 !important;
+    border-color: #424242 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-input::placeholder,
+  .ant-input-affix-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .ant-input-affix-wrapper:hover,
+  .ant-input-affix-wrapper-focused {
+    border-color: #17C3BE !important;
+  }
+
+  // ── Select dropdowns ──────────────────────────────────────────────────────
+  .ant-select-dropdown {
+    background: #262626 !important;
+    border: 1px solid #424242 !important;
+  }
+
+  .ant-select-item {
+    color: rgba(255, 255, 255, 0.85) !important;
+    &:hover { background: #2a2a2a !important; }
+  }
+
+  // ── Dropdowns / Menus ─────────────────────────────────────────────────────
+  .ant-dropdown-menu,
+  .ant-menu {
+    background: #1f1f1f !important;
+    border-color: #303030 !important;
+  }
+
+  .ant-dropdown-menu-item,
+  .ant-menu-item {
+    color: rgba(255, 255, 255, 0.85) !important;
+    &:hover { background: #2a2a2a !important; }
+  }
+
+  .ant-menu-item-divider,
+  .ant-dropdown-menu-item-divider {
+    background: #303030 !important;
+  }
+
+  // ── Modals ────────────────────────────────────────────────────────────────
+  .ant-modal-content,
+  .ant-modal-header {
+    background: #1f1f1f !important;
+    border-bottom-color: #303030 !important;
+  }
+
+  .ant-modal-title {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-modal-close {
+    color: rgba(255, 255, 255, 0.45) !important;
+    &:hover { color: rgba(255, 255, 255, 0.85) !important; }
+  }
+
+  // ── Form labels ───────────────────────────────────────────────────────────
+  .ant-form-item-label > label {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .ant-form-item-extra,
+  .ant-form-item-explain {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  // ── Drawer ────────────────────────────────────────────────────────────────
+  .ant-drawer-content,
+  .ant-drawer-header {
+    background: #1f1f1f !important;
+    border-bottom-color: #303030 !important;
+  }
+
+  .ant-drawer-title {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .mobile-nav-link {
+    color: rgba(255, 255, 255, 0.45) !important;
+    &:hover { background: rgba(23, 195, 190, 0.12) !important; color: #17C3BE !important; }
+    &.mobile-nav-active { background: rgba(23, 195, 190, 0.15) !important; color: #17C3BE !important; }
+  }
+
+  // ── Dividers ──────────────────────────────────────────────────────────────
+  .ant-divider {
+    border-color: #303030 !important;
+  }
+
+  // ── Spin overlay ──────────────────────────────────────────────────────────
+  .ant-spin-container::after {
+    background: rgba(20, 20, 20, 0.5) !important;
+  }
+
+  // ── Filter dropdown (price filter) ────────────────────────────────────────
+  .ant-table-filter-dropdown,
+  .ant-table-filter-dropdown-btns {
+    background: #262626 !important;
+    border-color: #424242 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  // ── Typography / text ─────────────────────────────────────────────────────
+  .text-muted {
+    color: rgba(255, 255, 255, 0.45) !important;
+  }
+
+  a {
+    color: #17C3BE;
+    &:hover { color: #3dd6d1; }
+  }
+
+  // ── Scrollbar ─────────────────────────────────────────────────────────────
+  ::-webkit-scrollbar-track { background: #1f1f1f; }
+  ::-webkit-scrollbar-thumb { background: #424242; &:hover { background: #5a5a5a; } }
+}
+
+// ── Utility classes ───────────────────────────────────────────────────────────
+.w-100 { width: 100%; }
+.h-100 { height: 100%; }
+.d-flex { display: flex; }
+.align-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.text-right { text-align: right; }
+
+// ── Page container ────────────────────────────────────────────────────────────
+.page-container {
+  padding: 24px;
+  background: #fff;
+  border-radius: 8px;
+}

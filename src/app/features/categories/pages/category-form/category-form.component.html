@@ -1,0 +1,76 @@
+<nz-spin [nzSpinning]="loading()">
+  <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+
+    <!-- Name -->
+    <nz-form-item>
+      <nz-form-label nzRequired>Name</nz-form-label>
+      <nz-form-control
+        nzHasFeedback
+        [nzErrorTip]="nameError"
+        [nzExtra]="nameExtra">
+        <input
+          nz-input
+          formControlName="name"
+          placeholder="Category name"
+          [maxlength]="NAME_MAX" />
+        <ng-template #nameError let-control>
+          @if (control.hasError('required') || control.hasError('notWhiteSpace')) {
+            Name is required.
+          } @else if (control.hasError('maxlength')) {
+            Maximum {{ NAME_MAX }} characters.
+          }
+        </ng-template>
+        <ng-template #nameExtra>
+          <app-char-counter [current]="nameLength()" [max]="NAME_MAX"></app-char-counter>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <!-- Description -->
+    <nz-form-item>
+      <nz-form-label>Description</nz-form-label>
+      <nz-form-control
+        [nzErrorTip]="descError"
+        [nzExtra]="descExtra">
+        <textarea
+          nz-input
+          formControlName="description"
+          placeholder="Optional description"
+          [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+          [maxlength]="DESC_MAX">
+        </textarea>
+        <ng-template #descError let-control>
+          @if (control.hasError('maxlength')) {
+            Maximum {{ DESC_MAX }} characters.
+          }
+        </ng-template>
+        <ng-template #descExtra>
+          <app-char-counter [current]="descLength()" [max]="DESC_MAX"></app-char-counter>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <!-- Status -->
+    <nz-form-item>
+      <nz-form-label nzRequired>Status</nz-form-label>
+      <nz-form-control [nzErrorTip]="statusError">
+        <nz-select formControlName="status" nzPlaceHolder="Select status">
+          @for (opt of statusOptions; track opt.value) {
+            <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+          }
+        </nz-select>
+        <ng-template #statusError let-control>
+          @if (control.hasError('required')) { Status is required. }
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <!-- Actions -->
+    <app-form-actions
+      [submitting]="submitting()"
+      [isEditMode]="isEditMode()"
+      (cancelled)="cancel()">
+    </app-form-actions>
+
+  </form>
+</nz-spin>

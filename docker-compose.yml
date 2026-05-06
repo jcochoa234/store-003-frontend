@@ -1,0 +1,32 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.yml — Frontend standalone
+#
+# Runs ONLY the Angular frontend container.
+# Use this when the API stack (DB, Keycloak, API) is already running separately
+# via the SS.Template docker-compose.yml.
+#
+# Usage:
+#   docker-compose up -d --build
+#   → http://localhost:4200
+#
+# For the full stack (API + Frontend together) use docker-compose.full.yml.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sstemplate-frontend:latest
+    container_name: sstemplate_frontend
+    ports:
+      - "4200:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

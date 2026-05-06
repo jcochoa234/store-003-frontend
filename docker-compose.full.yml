@@ -1,0 +1,103 @@
+version: '3.8'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.full.yml — Full stack
+#
+# Starts ALL services: PostgreSQL, Keycloak, Jaeger, API (.NET) and Frontend (Angular).
+# Both projects must be in their expected relative paths:
+#
+#   Templates/
+#   ├── SS.Template/SS.Template/    ← API (build context for the api service)
+#   └── SS.TemplatFrontend/         ← Frontend (this file lives here)
+#
+# Usage (from the SS.TemplatFrontend/ folder):
+#   docker-compose -f docker-compose.full.yml up -d --build
+#
+# Services:
+#   Frontend  → http://localhost:4200
+#   API       → http://localhost:8080/swagger
+#   Jaeger UI → http://localhost:16686
+#
+# Keycloak is hosted at https://keycloak.pinnacleaerospace.com (realm: pinnacle-dev)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: sstemplate_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: SSTemplateDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d SSTemplateDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Jaeger (distributed tracing) ───────────────────────────────────────────
+  jaeger:
+    image: jaegertracing/all-in-one:1.57
+    container_name: sstemplate_jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"    # Jaeger UI  → http://localhost:16686
+      - "4317:4317"      # OTLP gRPC receiver
+    restart: unless-stopped
+
+  # ── .NET API ───────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ../SS.Template/SS.Template    # Relative path to the API project
+      dockerfile: Dockerfile
+    image: sstemplate-api:latest
+    container_name: sstemplate_api
+    ports:
+      - "8080:8080"    # Swagger → http://localhost:8080/swagger
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Database=SSTemplateDb;Username=postgres;Password=postgres
+      - JwtSettings__Authority=https://keycloak.pinnacleaerospace.com/realms/pinnacle-dev
+      - JwtSettings__Audience=account
+      - JwtSettings__RequireHttpsMetadata=true
+      - CorsSettings__AllowedOrigins__0=http://localhost:4200
+      - Observability__ServiceName=SS.Template.Api
+      - Observability__OtlpEndpoint=http://jaeger:4317
+    depends_on:
+      db:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+    restart: unless-stopped
+
+  # ── Angular Frontend ────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sstemplate-frontend:latest
+    container_name: sstemplate_frontend
+    ports:
+      - "4200:80"    # App → http://localhost:4200
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  postgres_data:

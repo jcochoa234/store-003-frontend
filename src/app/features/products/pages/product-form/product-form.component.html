@@ -1,0 +1,99 @@
+<nz-spin [nzSpinning]="loading()">
+  <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+
+    <!-- Name -->
+    <nz-form-item>
+      <nz-form-label nzRequired>Name</nz-form-label>
+      <nz-form-control
+        nzHasFeedback
+        [nzErrorTip]="nameError"
+        [nzExtra]="nameExtra">
+        <input
+          nz-input
+          formControlName="name"
+          placeholder="Product name"
+          [maxlength]="NAME_MAX" />
+        <ng-template #nameError let-control>
+          @if (control.hasError('required') || control.hasError('notWhiteSpace')) {
+            Name is required.
+          } @else if (control.hasError('maxlength')) {
+            Maximum {{ NAME_MAX }} characters.
+          }
+        </ng-template>
+        <ng-template #nameExtra>
+          <app-char-counter [current]="nameLength()" [max]="NAME_MAX"></app-char-counter>
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <div nz-row [nzGutter]="16">
+      <!-- Price -->
+      <div nz-col [nzSpan]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Price</nz-form-label>
+          <nz-form-control nzHasFeedback [nzErrorTip]="priceError">
+            <nz-input-number
+              formControlName="price"
+              [nzMin]="0"
+              [nzStep]="0.01"
+              [nzPrecision]="2"
+              nzPrefix="$"
+              style="width: 100%;"
+              placeholder="0.00">
+            </nz-input-number>
+            <ng-template #priceError let-control>
+              @if (control.hasError('required')) {
+                Price is required.
+              } @else if (control.hasError('positiveOrZero')) {
+                Price must be 0 or greater.
+              }
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <!-- Category -->
+      <div nz-col [nzSpan]="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Category</nz-form-label>
+          <nz-form-control [nzErrorTip]="categoryError">
+            <nz-select
+              formControlName="categoryId"
+              nzPlaceHolder="Select a category"
+              nzShowSearch>
+              @for (cat of categories(); track cat.id) {
+                <nz-option [nzValue]="cat.id" [nzLabel]="cat.name"></nz-option>
+              }
+            </nz-select>
+            <ng-template #categoryError let-control>
+              @if (control.hasError('required')) { Category is required. }
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <nz-form-item>
+      <nz-form-label nzRequired>Status</nz-form-label>
+      <nz-form-control [nzErrorTip]="statusError">
+        <nz-select formControlName="status" nzPlaceHolder="Select status">
+          @for (opt of statusOptions; track opt.value) {
+            <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+          }
+        </nz-select>
+        <ng-template #statusError let-control>
+          @if (control.hasError('required')) { Status is required. }
+        </ng-template>
+      </nz-form-control>
+    </nz-form-item>
+
+    <!-- Actions -->
+    <app-form-actions
+      [submitting]="submitting()"
+      [isEditMode]="isEditMode()"
+      (cancelled)="cancel()">
+    </app-form-actions>
+
+  </form>
+</nz-spin>

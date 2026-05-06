@@ -1,0 +1,48 @@
+<app-page-header
+  [title]="product()?.name ?? 'Product Detail'"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  <app-detail-actions
+    backLink="/products"
+    [showEdit]="canEdit && !!product()"
+    [showDelete]="canDelete && !!product()"
+    deleteTitle="Delete this product?"
+    (edit)="openEditModal()"
+    (deleted)="delete()">
+  </app-detail-actions>
+</ng-template>
+
+<nz-card [nzBordered]="false">
+  <app-loading-container [loading]="loading()" [initialLoad]="true" [skeletonRows]="6">
+    @if (product(); as p) {
+    <nz-descriptions nzTitle="Product Information" nzBordered [nzColumn]="2">
+
+      <nz-descriptions-item nzTitle="ID">
+        <code>{{ p.id }}</code>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Category">
+        <a [routerLink]="['/categories']">{{ categoryName() }}</a>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Name" [nzSpan]="2">
+        <strong>{{ p.name }}</strong>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Price">
+        <span style="font-size: 18px; font-weight: 600; color: #17c3be;">
+          ${{ p.price | number: '1.2-2' }}
+        </span>
+      </nz-descriptions-item>
+
+      <nz-descriptions-item nzTitle="Status">
+        <app-status-tag [status]="p.status"></app-status-tag>
+      </nz-descriptions-item>
+
+    </nz-descriptions>
+    }
+  </app-loading-container>
+</nz-card>

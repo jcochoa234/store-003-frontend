@@ -1,0 +1,62 @@
+// Entity-specific styles — generic filter-bar, search, empty-state CSS lives in shared components
+.filter-select { min-width: 160px; }
+
+.price-separator { color: rgba(0,0,0,0.45); font-size: 13px; padding: 0 2px; }
+
+.price-filter-dropdown {
+  padding: 8px 12px;
+  min-width: 220px;
+}
+
+.price-filter-inputs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.price-filter-input { width: 86px; }
+
+.price-filter-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+// Active filter tags (entity-specific, rendered in this component's template)
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  border-radius: 6px;
+  padding: 0 8px;
+  height: 28px;
+
+  .tag-close {
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.7;
+    margin-left: 2px;
+    &:hover { opacity: 1; }
+  }
+}
+
+.text-muted { color: rgba(0, 0, 0, 0.45); }
+
+.price {
+  font-weight: 600;
+  color: #17c3be;
+  font-family: monospace;
+}
+
+@media (max-width: 767px) {
+  :ng-deep .ant-card-body { padding: 12px; }
+  :ng-deep .col-hide-mobile { display: none; }
+}

@@ -1,0 +1,33 @@
+// Active filter tags (entity-specific, rendered in this component's template)
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.active-filter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  border-radius: 6px;
+  padding: 0 8px;
+  height: 28px;
+
+  .tag-close {
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.7;
+    margin-left: 2px;
+    &:hover { opacity: 1; }
+  }
+}
+
+.text-muted { color: rgba(0, 0, 0, 0.45); }
+
+@media (max-width: 767px) {
+  :ng-deep .ant-card-body { padding: 12px; }
+  :ng-deep .col-hide-mobile { display: none; }
+}

@@ -1,0 +1,145 @@
+<div class="loading-bar" [class.active]="httpLoading.isLoading()"></div>
+
+<nz-layout class="app-layout">
+
+  <!-- Top Navigation -->
+  <nz-header class="app-header">
+    <div class="header-inner">
+
+      <!-- Hamburger (mobile only) -->
+      <button class="hamburger-btn" (click)="mobileMenuOpen.set(true)">
+        <span nz-icon nzType="menu"></span>
+      </button>
+
+      <!-- Brand -->
+      <a class="header-brand" routerLink="/dashboard">
+        <img [src]="theme.isDark() ? '/assets/pinnacle-logo-dark.svg' : '/assets/pinnacle-logo.svg'"
+             class="brand-logo" alt="Pinnacle Aerospace" />
+      </a>
+
+      <!-- Nav links (desktop only) -->
+      <nav class="nav-links">
+        <a routerLink="/dashboard"
+           routerLinkActive="nav-active"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="nav-link">
+          Dashboard
+        </a>
+        <a routerLink="/categories"
+           routerLinkActive="nav-active"
+           class="nav-link">
+          Categories
+        </a>
+        <a routerLink="/products"
+           routerLinkActive="nav-active"
+           class="nav-link">
+          Products
+        </a>
+        <a routerLink="/suppliers"
+           routerLinkActive="nav-active"
+           class="nav-link">
+          Suppliers
+        </a>
+      </nav>
+
+      <!-- Notifications -->
+      <div class="header-notifications">
+        <nz-badge [nzCount]="notificationCount()" nzSize="small">
+          <span nz-icon nzType="bell" class="notif-icon"></span>
+        </nz-badge>
+      </div>
+
+      <!-- Theme toggle -->
+      <button class="theme-toggle-btn"
+              (click)="theme.toggle()"
+              [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+              nz-tooltip [nzTooltipTitle]="theme.isDark() ? 'Light mode' : 'Dark mode'">
+        <span nz-icon nzType="bulb" [nzTheme]="theme.isDark() ? 'fill' : 'outline'"></span>
+      </button>
+
+      <!-- User section -->
+      <div class="header-user">
+        <a nz-dropdown [nzDropdownMenu]="userMenu" nzPlacement="bottomRight" class="user-trigger">
+          <div class="user-meta">
+            <span class="user-name">{{ fullName() }}</span>
+            <span class="user-role">{{ roles()[0] || 'User' }}</span>
+          </div>
+          <nz-avatar [nzText]="getInitials()" class="user-avatar"></nz-avatar>
+        </a>
+
+        <nz-dropdown-menu #userMenu="nzDropdownMenu">
+          <ul nz-menu>
+            <li nz-menu-item>
+              <span nz-icon nzType="user"></span>
+              <span style="margin-left: 8px;">{{ profile()?.email }}</span>
+            </li>
+            @if (roles().length > 0) {
+              <li nz-menu-item>
+                <span nz-icon nzType="safety-certificate"></span>
+                <span style="margin-left: 8px;">{{ roles().join(', ') }}</span>
+              </li>
+            }
+            <li nz-menu-divider></li>
+            <li nz-menu-item (click)="logout()">
+              <span nz-icon nzType="logout"></span>
+              <span style="margin-left: 8px;">Sign out</span>
+            </li>
+          </ul>
+        </nz-dropdown-menu>
+      </div>
+
+    </div>
+  </nz-header>
+
+  <!-- Mobile drawer -->
+  <nz-drawer
+    [nzVisible]="mobileMenuOpen()"
+    nzPlacement="left"
+    nzTitle="Store 003"
+    [nzWidth]="240"
+    (nzOnClose)="mobileMenuOpen.set(false)">
+    <ng-container *nzDrawerContent>
+      <nav class="mobile-nav">
+        <a routerLink="/dashboard"
+           routerLinkActive="mobile-nav-active"
+           [routerLinkActiveOptions]="{exact: true}"
+           class="mobile-nav-link"
+           (click)="mobileMenuOpen.set(false)">
+          <span nz-icon nzType="dashboard"></span>
+          Dashboard
+        </a>
+        <a routerLink="/categories"
+           routerLinkActive="mobile-nav-active"
+           class="mobile-nav-link"
+           (click)="mobileMenuOpen.set(false)">
+          <span nz-icon nzType="tags"></span>
+          Categories
+        </a>
+        <a routerLink="/products"
+           routerLinkActive="mobile-nav-active"
+           class="mobile-nav-link"
+           (click)="mobileMenuOpen.set(false)">
+          <span nz-icon nzType="inbox"></span>
+          Products
+        </a>
+        <a routerLink="/suppliers"
+           routerLinkActive="mobile-nav-active"
+           class="mobile-nav-link"
+           (click)="mobileMenuOpen.set(false)">
+          <span nz-icon nzType="team"></span>
+          Suppliers
+        </a>
+      </nav>
+    </ng-container>
+  </nz-drawer>
+
+  <!-- Page content -->
+  <nz-content class="app-content">
+    <router-outlet></router-outlet>
+  </nz-content>
+
+  <nz-footer class="app-footer">
+    Store003Frontend © 2025 — Store 003
+  </nz-footer>
+
+</nz-layout>

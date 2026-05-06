@@ -1,0 +1,31 @@
+<app-page-header
+  title="Supplier Detail"
+  [breadcrumbs]="breadcrumbs"
+  [extraTemplate]="headerExtra">
+</app-page-header>
+
+<ng-template #headerExtra>
+  <app-detail-actions
+    backLink="/suppliers"
+    [showEdit]="canEdit && !!supplier()"
+    [showDelete]="canDelete && !!supplier()"
+    deleteTitle="Delete this supplier?"
+    (edit)="openEditModal()"
+    (deleted)="delete()">
+  </app-detail-actions>
+</ng-template>
+
+<nz-card [nzBordered]="false">
+  <app-loading-container [loading]="loading()" [initialLoad]="true" [skeletonRows]="4">
+    @if (supplier(); as s) {
+      <nz-descriptions nzBordered [nzColumn]="1">
+        <nz-descriptions-item nzTitle="Name">{{ s.name }}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Contact Email">{{ s.contactEmail }}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Phone">{{ s.phone }}</nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Status">
+          <app-status-tag [status]="s.status"></app-status-tag>
+        </nz-descriptions-item>
+      </nz-descriptions>
+    }
+  </app-loading-container>
+</nz-card>
